@@ -23,8 +23,8 @@ type ApiError struct {
 	Details map[string]interface{} `json:"details,omitempty"`
 }
 
-// HyperMidError is returned when the API responds with an error.
-type HyperMidError struct {
+// HypermidError is returned when the API responds with an error.
+type HypermidError struct {
 	// Code is the API error code (e.g. "NO_ROUTE_FOUND", "RATE_LIMITED").
 	Code string
 	// Msg is the human-readable error message.
@@ -37,41 +37,41 @@ type HyperMidError struct {
 	Details map[string]interface{}
 }
 
-func (e *HyperMidError) Error() string {
+func (e *HypermidError) Error() string {
 	return fmt.Sprintf("hypermid: %s: %s (HTTP %d, requestId=%s)", e.Code, e.Msg, e.Status, e.Meta.RequestID)
 }
 
-// HyperMidTimeoutError is returned when a request exceeds the configured timeout.
-type HyperMidTimeoutError struct {
+// HypermidTimeoutError is returned when a request exceeds the configured timeout.
+type HypermidTimeoutError struct {
 	TimeoutMs int
 }
 
-func (e *HyperMidTimeoutError) Error() string {
+func (e *HypermidTimeoutError) Error() string {
 	return fmt.Sprintf("hypermid: request timed out after %dms", e.TimeoutMs)
 }
 
-// HyperMidNetworkError is returned when a network-level error occurs.
-type HyperMidNetworkError struct {
+// HypermidNetworkError is returned when a network-level error occurs.
+type HypermidNetworkError struct {
 	Msg   string
 	Cause error
 }
 
-func (e *HyperMidNetworkError) Error() string {
+func (e *HypermidNetworkError) Error() string {
 	if e.Cause != nil {
 		return fmt.Sprintf("hypermid: network error: %s: %v", e.Msg, e.Cause)
 	}
 	return fmt.Sprintf("hypermid: network error: %s", e.Msg)
 }
 
-func (e *HyperMidNetworkError) Unwrap() error {
+func (e *HypermidNetworkError) Unwrap() error {
 	return e.Cause
 }
 
-// HyperMidPollTimeoutError is returned when status polling exceeds the maximum wait time or attempts.
-type HyperMidPollTimeoutError struct {
+// HypermidPollTimeoutError is returned when status polling exceeds the maximum wait time or attempts.
+type HypermidPollTimeoutError struct {
 	Msg string
 }
 
-func (e *HyperMidPollTimeoutError) Error() string {
+func (e *HypermidPollTimeoutError) Error() string {
 	return fmt.Sprintf("hypermid: %s", e.Msg)
 }

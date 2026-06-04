@@ -49,12 +49,12 @@ func (c *Client) WaitForDepositCompletion(ctx context.Context, params DepositSta
 		}
 
 		if time.Since(start) >= maxWait {
-			return DepositStatusResponse{}, &HyperMidPollTimeoutError{
+			return DepositStatusResponse{}, &HypermidPollTimeoutError{
 				Msg: fmt.Sprintf("deposit status polling timed out after %v (last status: %s)", maxWait, status.Status),
 			}
 		}
 		if maxPolls > 0 && polls >= maxPolls {
-			return DepositStatusResponse{}, &HyperMidPollTimeoutError{
+			return DepositStatusResponse{}, &HypermidPollTimeoutError{
 				Msg: fmt.Sprintf("deposit status polling exceeded %d attempts (last status: %s)", maxPolls, status.Status),
 			}
 		}
@@ -91,12 +91,12 @@ func (c *Client) WaitForLiFiCompletion(ctx context.Context, params LiFiStatusPar
 		}
 
 		if time.Since(start) >= maxWait {
-			return StatusResponse{}, &HyperMidPollTimeoutError{
+			return StatusResponse{}, &HypermidPollTimeoutError{
 				Msg: fmt.Sprintf("LI.FI status polling timed out after %v (last status: %s)", maxWait, status.Status),
 			}
 		}
 		if maxPolls > 0 && polls >= maxPolls {
-			return StatusResponse{}, &HyperMidPollTimeoutError{
+			return StatusResponse{}, &HypermidPollTimeoutError{
 				Msg: fmt.Sprintf("LI.FI status polling exceeded %d attempts (last status: %s)", maxPolls, status.Status),
 			}
 		}

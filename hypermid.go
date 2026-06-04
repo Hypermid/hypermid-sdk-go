@@ -1,6 +1,6 @@
-// Package hypermid provides a Go client for the HyperMid Partner API.
+// Package hypermid provides a Go client for the Hypermid Partner API.
 //
-// The SDK supports all HyperMid API endpoints including cross-chain swaps
+// The SDK supports all Hypermid API endpoints including cross-chain swaps
 // (LI.FI + Near Intents), fiat on-ramp, partner analytics, and webhooks.
 //
 // Usage:
@@ -32,7 +32,7 @@ const (
 	apiVersion     = "/v1"
 )
 
-// Config configures the HyperMid client.
+// Config configures the Hypermid client.
 type Config struct {
 	// APIKey for authenticated access (2000 req/min, partner fee tier).
 	// Optional — anonymous access allows 100 req/min.
@@ -45,14 +45,14 @@ type Config struct {
 	HTTPClient *http.Client
 }
 
-// Client is the HyperMid API client.
+// Client is the Hypermid API client.
 type Client struct {
 	baseURL    string
 	apiKey     string
 	httpClient *http.Client
 }
 
-// New creates a new HyperMid client. Pass nil for default configuration.
+// New creates a new Hypermid client. Pass nil for default configuration.
 func New(cfg *Config) *Client {
 	c := &Client{
 		baseURL: defaultBaseURL,
@@ -92,14 +92,14 @@ func (c *Client) doRequest(ctx context.Context, method, path string, query url.V
 	if body != nil {
 		b, err := json.Marshal(body)
 		if err != nil {
-			return nil, &HyperMidNetworkError{Msg: "failed to marshal request body", Cause: err}
+			return nil, &HypermidNetworkError{Msg: "failed to marshal request body", Cause: err}
 		}
 		bodyReader = strings.NewReader(string(b))
 	}
 
 	req, err := http.NewRequestWithContext(ctx, method, u, bodyReader)
 	if err != nil {
-		return nil, &HyperMidNetworkError{Msg: "failed to create request", Cause: err}
+		return nil, &HypermidNetworkError{Msg: "failed to create request", Cause: err}
 	}
 
 	if c.apiKey != "" {
@@ -112,24 +112,24 @@ func (c *Client) doRequest(ctx context.Context, method, path string, query url.V
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		if ctx.Err() != nil {
-			return nil, &HyperMidTimeoutError{TimeoutMs: int(c.httpClient.Timeout.Milliseconds())}
+			return nil, &HypermidTimeoutError{TimeoutMs: int(c.httpClient.Timeout.Milliseconds())}
 		}
-		return nil, &HyperMidNetworkError{Msg: "request failed", Cause: err}
+		return nil, &HypermidNetworkError{Msg: "request failed", Cause: err}
 	}
 	defer resp.Body.Close()
 
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, &HyperMidNetworkError{Msg: "failed to read response body", Cause: err}
+		return nil, &HypermidNetworkError{Msg: "failed to read response body", Cause: err}
 	}
 
 	var envelope apiResponse
 	if err := json.Unmarshal(respBody, &envelope); err != nil {
-		return nil, &HyperMidNetworkError{Msg: fmt.Sprintf("invalid JSON response (HTTP %d)", resp.StatusCode)}
+		return nil, &HypermidNetworkError{Msg: fmt.Sprintf("invalid JSON response (HTTP %d)", resp.StatusCode)}
 	}
 
 	if envelope.Error != nil {
-		return nil, &HyperMidError{
+		return nil, &HypermidError{
 			Code:    envelope.Error.Code,
 			Msg:     envelope.Error.Message,
 			Status:  resp.StatusCode,
@@ -160,7 +160,7 @@ func unmarshal[T any](data json.RawMessage, err error) (T, error) {
 		return zero, err
 	}
 	if err := json.Unmarshal(data, &zero); err != nil {
-		return zero, &HyperMidNetworkError{Msg: "failed to decode response data"}
+		return zero, &HypermidNetworkError{Msg: "failed to decode response data"}
 	}
 	return zero, nil
 }

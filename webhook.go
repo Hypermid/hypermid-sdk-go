@@ -8,7 +8,7 @@ import (
 
 // VerifyWebhookSignature validates an incoming webhook signature.
 //
-// When HyperMid sends a webhook, it includes:
+// When Hypermid sends a webhook, it includes:
 //   - X-Hypermid-Signature: HMAC-SHA256 hex digest of the raw body
 //   - X-Hypermid-Event: event type (e.g. "swap.completed")
 //
