@@ -472,3 +472,66 @@ type PollConfig struct {
 	// MaxPolls is the maximum number of poll attempts (default: 0 = unlimited).
 	MaxPolls int
 }
+
+// ─── Balances ────────────────────────────────────────────────────────────
+
+// BalancesParams is the input for GetBalances. ChainIDs is optional and is
+// sent as a comma-separated `chainIds` query param (not a JSON body).
+type BalancesParams struct {
+	Address  string `json:"-"`
+	ChainIDs []int  `json:"-"`
+}
+
+// TokenBalance is a single token holding for an address.
+type TokenBalance struct {
+	ChainID    int      `json:"chainId"`
+	Address    string   `json:"address"`
+	Symbol     string   `json:"symbol"`
+	Name       string   `json:"name"`
+	Decimals   int      `json:"decimals"`
+	Balance    string   `json:"balance"`
+	PriceUSD   float64  `json:"priceUSD"`
+	BalanceUSD float64  `json:"balanceUSD"`
+	LogoURI    string   `json:"logoURI"`
+	Providers  []string `json:"providers"`
+}
+
+// BalanceChainMeta is the per-chain fetch status (use to render retry chips
+// for failing chains rather than hiding them).
+type BalanceChainMeta struct {
+	OK         bool   `json:"ok"`
+	Error      string `json:"error,omitempty"`
+	Source     string `json:"source,omitempty"`
+	DurationMs int    `json:"durationMs"`
+	Stale      bool   `json:"stale,omitempty"`
+}
+
+// BalancesResponse is the GetBalances result.
+type BalancesResponse struct {
+	Address         string                      `json:"address"`
+	TotalBalanceUSD string                      `json:"totalBalanceUSD"`
+	Balances        map[string][]TokenBalance   `json:"balances"`
+	ChainMeta       map[string]BalanceChainMeta `json:"chainMeta,omitempty"`
+	CachedAt        string                      `json:"cachedAt,omitempty"`
+	CacheHit        bool                        `json:"cacheHit,omitempty"`
+}
+
+// ─── Inbound receiver (SuperSwap V2) ─────────────────────────────────────
+
+// InboundReceiverParams registers a SuperSwap V2 inbound deposit.
+type InboundReceiverParams struct {
+	TxHash            string `json:"txHash"`
+	FromAddress       string `json:"fromAddress"`
+	ToAddress         string `json:"toAddress"`
+	OutputToken       string `json:"outputToken"`
+	DestinationDomain int    `json:"destinationDomain"`
+	Signature         string `json:"signature"`
+}
+
+// InboundReceiverResponse is the RegisterInboundReceiver result.
+type InboundReceiverResponse struct {
+	Registered bool   `json:"registered"`
+	RecordID   string `json:"recordId"`
+	USDCAmount string `json:"usdcAmount"`
+	Status     string `json:"status"`
+}
