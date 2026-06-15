@@ -12,6 +12,12 @@ func IsNearIntentsRoute(resp *ExecuteResponse) bool {
 	return resp.Provider == "near-intents"
 }
 
+// IsSuperSwapRoute returns true if the execute response is a SuperSwap V2 route
+// (wallet, has transactionRequest).
+func IsSuperSwapRoute(resp *ExecuteResponse) bool {
+	return resp.Provider == "superswap"
+}
+
 // IsManualDeposit returns true if a Near Intents deposit requires manual user action
 // (QR code / copy address).
 func IsManualDeposit(resp *ExecuteResponse) bool {
@@ -21,6 +27,7 @@ func IsManualDeposit(resp *ExecuteResponse) bool {
 // IsWalletDeposit returns true if the deposit can be done programmatically via wallet.
 func IsWalletDeposit(resp *ExecuteResponse) bool {
 	return resp.Provider == "lifi" ||
+		resp.Provider == "superswap" ||
 		(resp.Provider == "near-intents" && resp.DepositMode == "wallet")
 }
 
@@ -36,6 +43,16 @@ func IsNIStatusTerminal(status string) bool {
 
 // IsLiFiStatusTerminal returns true if a LI.FI status is terminal.
 func IsLiFiStatusTerminal(status string) bool {
+	switch status {
+	case "DONE", "FAILED":
+		return true
+	}
+	return false
+}
+
+// IsSuperSwapStatusTerminal returns true if a SuperSwap V2 status is terminal
+// (vocabulary: PENDING | DONE | FAILED | NOT_FOUND | INVALID).
+func IsSuperSwapStatusTerminal(status string) bool {
 	switch status {
 	case "DONE", "FAILED":
 		return true

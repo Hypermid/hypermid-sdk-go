@@ -133,8 +133,34 @@ type StatusParams struct {
 type StatusResponse struct {
 	Provider string `json:"provider"`
 	Status   string `json:"status,omitempty"`
-	// Additional fields vary by provider; decode with json.RawMessage if needed.
+	// Extra carries provider-specific fields beyond Provider/Status — e.g. for
+	// SuperSwap V2: hyperlaneMessageId, subStatus, sending, receiving,
+	// destinationTxHash. Populated by UnmarshalJSON below.
 	Extra map[string]interface{} `json:"-"`
+}
+
+// UnmarshalJSON decodes Provider/Status into their typed fields and collects
+// every other key into Extra, so provider-specific data (e.g. SuperSwap V2's
+// hyperlaneMessageId / sending / receiving legs) is never dropped.
+func (s *StatusResponse) UnmarshalJSON(data []byte) error {
+	var raw map[string]json.RawMessage
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	s.Extra = make(map[string]interface{}, len(raw))
+	for k, v := range raw {
+		switch k {
+		case "provider":
+			_ = json.Unmarshal(v, &s.Provider)
+		case "status":
+			_ = json.Unmarshal(v, &s.Status)
+		default:
+			var val interface{}
+			_ = json.Unmarshal(v, &val)
+			s.Extra[k] = val
+		}
+	}
+	return nil
 }
 
 // LiFiStatusParams are parameters for polling LI.FI swap status.
@@ -181,6 +207,15 @@ type ExecuteResponse struct {
 	MinAmountOut    string   `json:"minAmountOut,omitempty"`
 	TimeEstimate    *int     `json:"timeEstimate,omitempty"`
 	CorrelationID   string   `json:"correlationId,omitempty"`
+
+	// SuperSwap V2 fields (Provider == "superswap"). Approve ApprovalAddress
+	// (source DiamondShell, equals TransactionRequest.To), then sign and
+	// broadcast TransactionRequest above.
+	Source          string `json:"source,omitempty"`
+	ApprovalAddress string `json:"approvalAddress,omitempty"`
+	EstimatedOutput string `json:"estimatedOutput,omitempty"`
+	MinOutput       string `json:"minOutput,omitempty"`
+	V2              bool   `json:"v2,omitempty"`
 
 	// Instructions (present for both providers)
 	Instructions map[string]string `json:"instructions,omitempty"`
